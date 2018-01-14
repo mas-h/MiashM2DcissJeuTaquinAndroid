@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity  {
     private CheckBox checkBox;
     private CheckBox checkBox2;
     private CheckBox checkBox3;
+    private Button playButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +62,8 @@ public class MainActivity extends AppCompatActivity  {
         setContentView(R.layout.activity_main); // chargement du layout
 
         imageView = (ImageView) findViewById(R.id.imageView); // définition de la zone où se trouvera l'image d'aperçu avant de démarrer le jeu
+        playButton = (Button) findViewById(R.id.BtnJouer); // on récupère l'id du bouton Play
+        playButton.setEnabled(false); // on désactive le bouton jouer car on veut que le joueur choisisse un niveau et une image avant de lancer le jeu
 
         checkBox = (CheckBox) findViewById(R.id.checkBox);
         checkBox2 = (CheckBox) findViewById(R.id.checkBox2);
@@ -71,12 +74,14 @@ public class MainActivity extends AppCompatActivity  {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(checkBox.isChecked()) {
                     checkBox2.setChecked(false);
-
                     checkBox3.setChecked(false);
-
+                    playButton.setEnabled(true);
                 }
                 else{
                     checkBox.setChecked(false);
+                    if (!(checkBox.isChecked() && checkBox3.isChecked() && checkBox2.isChecked())){
+                        playButton.setEnabled(false);
+                    }
 
                 }
             }
@@ -86,13 +91,14 @@ public class MainActivity extends AppCompatActivity  {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(checkBox2.isChecked()) {
                     checkBox.setChecked(false);
-
                     checkBox3.setChecked(false);
-
+                    playButton.setEnabled(true);
                 }
                 else{
                     checkBox2.setChecked(false);
-
+                    if (!(checkBox.isChecked() && checkBox3.isChecked() && checkBox2.isChecked())){
+                        playButton.setEnabled(false);
+                    }
                 }
 
             }
@@ -102,16 +108,22 @@ public class MainActivity extends AppCompatActivity  {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(checkBox3.isChecked()) {
                     checkBox2.setChecked(false);
-
                     checkBox.setChecked(false);
+                    playButton.setEnabled(true);
 
                 }
                 else{
                     checkBox3.setChecked(false);
-
+                    if (!(checkBox.isChecked() && checkBox3.isChecked() && checkBox2.isChecked())){
+                        playButton.setEnabled(false);
+                    }
                 }
             }
         });
+
+        CharSequence text = "Pour commencer à jouer, vous devez cocher un niveau et choisir une image ";
+        Toast toast = Toast.makeText(getApplicationContext(),text,Toast.LENGTH_LONG);
+        toast.show();
 
         // Définition du bouton pour lancer l'appareil photo
         Button capture = (Button) findViewById(R.id.btnCapture);
@@ -126,28 +138,41 @@ public class MainActivity extends AppCompatActivity  {
 
         // Définition du bouton de lancement du jeu, au clique on enregistre la photo
         // et on lance la seconde activité en envoyant le lien de la photo et le niveau de la grille
-        Button btnJouer = (Button) findViewById(R.id.BtnJouer);
+      //  Button btnJouer = (Button) findViewById(R.id.BtnJouer);
 
-        btnJouer.setOnClickListener(new View.OnClickListener() {
+
+
+
+        playButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if (choice == REQUEST_TAKE_PHOTO) {
-                    galleryAddPic();
-                    //==================================================================================
-                    Log.d("Message", "Je suis dans btnJouerCamera " + mCurrentPhotoPath);
+                if (uriString != null ) {
+                    if (choice == REQUEST_TAKE_PHOTO) {
+                        galleryAddPic();
+                        //==================================================================================
+                        Log.d("Message", "Je suis dans btnJouerCamera " + mCurrentPhotoPath);
+
+                    }
+                    if (choice == SELECT_FILE) {
+                        mCurrentPhotoPath = uriString.toString();
+                        //==================================================================================
+                        Log.d("Message", "Je suis dans btnJouerGallery " + mCurrentPhotoPath);
+                    }
+
+                    Intent intent = new Intent(MainActivity.this, TaquinActivity.class);
+                    intent.putExtra("choice", getChoice());
+                    intent.putExtra("mCurrentPhotoPath", mCurrentPhotoPath);
+                    intent.putExtra("level", level);
+                    startActivity(intent);
+                }
+                else{
+                    CharSequence text = "Vous avez oublié de choisir une image ;)";
+                    Toast toast = Toast.makeText(getApplicationContext(),text,Toast.LENGTH_SHORT);
+                    toast.show();
 
                 }
-                if(choice == SELECT_FILE) {
-                    mCurrentPhotoPath= uriString.toString();
-                    //==================================================================================
-                    Log.d("Message", "Je suis dans btnJouerGallery " + mCurrentPhotoPath);
-                }
-
-                Intent intent = new Intent(MainActivity.this, TaquinActivity.class);
-                intent.putExtra("choice", getChoice());
-                intent.putExtra("mCurrentPhotoPath", mCurrentPhotoPath);
-                intent.putExtra("level", level);
-                startActivity(intent);
             }
+
+
         });
     }
 

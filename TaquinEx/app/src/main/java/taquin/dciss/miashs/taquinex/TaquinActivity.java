@@ -97,6 +97,10 @@ public class TaquinActivity extends AppCompatActivity {
         taquinAdapter = new TaquinAdapter(this, level, bitmap, m.widthPixels, m.heightPixels);
         gridview.setAdapter(taquinAdapter);
 
+        CharSequence text = "Ne me décevez pas et remportez la victoire jeune padawan ! ";
+        Toast toast = Toast.makeText(getApplicationContext(),text,Toast.LENGTH_LONG);
+        toast.show();
+
         // Au clique sur une case on effectue différents tests et traitements
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
